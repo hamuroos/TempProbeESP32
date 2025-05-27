@@ -16,6 +16,7 @@
 void Backlight_adjustment_event_cb(lv_event_t * e);
 
 void Lvgl_Example1(void);
+static void getSKUFromAPI();
 void LVGL_Backlight_adjustment(uint8_t Backlight);
 
 float Temp_get(void);
