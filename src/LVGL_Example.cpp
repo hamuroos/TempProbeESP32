@@ -97,7 +97,7 @@ lv_obj_t *Wireless_Scan;
 lv_obj_t *Backlight_slider;
 
 // extern const lv_font_t ThaiSansNeue_Bold_25;
-LV_FONT_DECLARE(Sarabun);
+LV_FONT_DECLARE(Sarabun_12);
 
 /////////////////// V2 added /////////////////////////
 
@@ -1356,8 +1356,8 @@ static void API_tester_create(lv_obj_t *parent)
 {
   // API testing button
   APIBtn = lv_btn_create(parent);
-  lv_obj_set_size(APIBtn, 35, 50);
-  lv_obj_align(APIBtn, LV_ALIGN_CENTER, 0, 0);
+  lv_obj_set_size(APIBtn, 40, 40);
+  lv_obj_align(APIBtn, LV_ALIGN_CENTER, 0, 10);
   lv_obj_t *API_label = lv_label_create(APIBtn); /*Add a label to the button*/
   lv_label_set_text(API_label, LV_SYMBOL_POWER); /*Set the labels text*/
   lv_obj_center(API_label);
@@ -1365,10 +1365,10 @@ static void API_tester_create(lv_obj_t *parent)
 
   // API testing button
   APISendBtn = lv_btn_create(parent);
-  lv_obj_set_size(APISendBtn, 35, 50);
+  lv_obj_set_size(APISendBtn, 40, 40);
   lv_obj_align(APISendBtn, LV_ALIGN_CENTER, 0, -20);
   lv_obj_t *APISend_label = lv_label_create(APISendBtn); /*Add a label to the button*/
-  lv_label_set_text(APISend_label, LV_SYMBOL_CHARGE); /*Set the labels text*/
+  lv_label_set_text(APISend_label, LV_SYMBOL_CHARGE);    /*Set the labels text*/
   lv_obj_center(APISend_label);
   lv_obj_add_event_cb(APISendBtn, API_btn_event_cb, LV_EVENT_ALL, NULL);
 
@@ -1376,7 +1376,7 @@ static void API_tester_create(lv_obj_t *parent)
   dropdownSKU = lv_dropdown_create(parent);
   lv_obj_align(dropdownSKU, LV_ALIGN_CENTER, 0, 40);
   lv_dropdown_set_options(dropdownSKU, "");
-  lv_obj_set_style_text_font(dropdownSKU, &Sarabun, LV_PART_MAIN);
+  lv_obj_set_style_text_font(dropdownSKU, &Sarabun_12, LV_PART_MAIN);
   /*Use a custom image as down icon and flip it when the list is opened*/
   LV_IMG_DECLARE(img_caret_down)
   lv_dropdown_set_symbol(dropdownSKU, &img_caret_down);
@@ -1384,7 +1384,7 @@ static void API_tester_create(lv_obj_t *parent)
   // set Thai font style to dropdown list items
   lv_obj_t *list = lv_dropdown_get_list(dropdownSKU); // get list object
   lv_style_init(&my_style);                           // Initialize the style
-  lv_style_set_text_font(&my_style, &Sarabun);        // Set the font
+  lv_style_set_text_font(&my_style, &Sarabun_12);        // Set the font
   lv_obj_add_style(list, &my_style, LV_PART_MAIN);    // Apply the style to the list object
 
   // Batch Number placeholder
@@ -1427,7 +1427,8 @@ static void batch_change_event_cb(lv_event_t *e)
     else if (btn == BatchDownBtn)
     {
       selectedBatchNo--;
-      if(selectedBatchNo < 0) {
+      if (selectedBatchNo < 0)
+      {
         selectedBatchNo = 0;
       }
       lv_label_set_text_fmt(BatchNo, "Batch no. : %d", selectedBatchNo + 1);
@@ -1466,7 +1467,25 @@ static void getSKUFromAPI()
 {
   clearSKUlist(); // reset SKU dropdown and arrays
   printf("___________________________________");
-  String serverName = "https://4670c375-148f-45e6-9f59-78fe1fa3f94b.mock.pstmn.io/getSKU";
+  //char dateToReq[] = "https://4670c375-148f-45e6-9f59-78fe1fa3f94b.mock.pstmn.io/getSKU";
+  /// 2023-09-08
+  // https://ebe105tyej.execute-api.ap-southeast-1.amazonaws.com/prod/mes/bakery/planning/detail/2023-09-08
+
+  struct tm timeinfo;
+  if (!getLocalTime(&timeinfo))
+  {
+    printf("Failed to obtain time \n");
+
+    return;
+  }
+  int year = timeinfo.tm_year + 1900;
+  int month = timeinfo.tm_mon + 1;
+  int day = timeinfo.tm_mday;
+
+  char SKU_API_PATH[150];
+  snprintf(SKU_API_PATH, sizeof(SKU_API_PATH), "%s/%d-%d-%d", BAKERY_SKU_ENDPOINT, year, month, day);
+  printf("\n%s\n", SKU_API_PATH);
+
   String payload;
   unsigned long lastTime = 0;
   unsigned long timerDelay = 5000;
@@ -1474,12 +1493,14 @@ static void getSKUFromAPI()
   WiFiClientSecure *client = new WiFiClientSecure;
 
   HTTPClient http;
-  http.begin(serverName.c_str());
+  http.begin(SKU_API_PATH);
+  http.addHeader("authorizationToken", "fP3zfY41llvD#h6$RlM3");
   int httpResponseCode = http.GET();
 
   if (httpResponseCode > 0)
   {
     payload = http.getString();
+    printf("%d\n", httpResponseCode);
   }
   else
   {
@@ -1537,7 +1558,7 @@ static void getSKUFromAPI()
     printf("%d %s\n", i, SKUs_nonDup[i]);
   }*/
 
-  //http.end();
+  // http.end();
 }
 
 static void addSKUnonDup(const char *item)
@@ -1568,7 +1589,7 @@ static void addSKUList()
     }
   }
   lv_dropdown_set_options(dropdownSKU, temp.c_str());
-  lv_obj_set_style_text_font(dropdownSKU, &Sarabun, LV_PART_MAIN);
+  lv_obj_set_style_text_font(dropdownSKU, &Sarabun_12, LV_PART_MAIN);
 }
 
 static void clearSKUlist()

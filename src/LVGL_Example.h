@@ -20,3 +20,5 @@ static void getSKUFromAPI();
 void LVGL_Backlight_adjustment(uint8_t Backlight);
 
 float Temp_get(void);
+
+const char BAKERY_SKU_ENDPOINT[] = "https://ebe105tyej.execute-api.ap-southeast-1.amazonaws.com/prod/mes/bakery/planning/detail";

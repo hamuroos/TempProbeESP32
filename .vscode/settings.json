@@ -5,6 +5,7 @@
         "string_view": "cpp",
         "span": "cpp",
         "text_encoding": "cpp",
-        "thread": "cpp"
+        "thread": "cpp",
+        "chrono": "cpp"
     }
 }
